@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHOT CS2 Case Game</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            background-color: #12151d;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 15px;
+            text-align: center;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #232733;
+            padding-bottom: 10px;
+        }
+        .balance {
+            background: #1e2330;
+            padding: 8px 15px;
+            border-radius: 8px;
+            color: #28a745;
+            font-weight: bold;
+        }
+        .nav-menu {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            margin: 15px 0;
+            padding-bottom: 5px;
+        }
+        .nav-btn {
+            background: #1e2330;
+            color: #8a8d9b;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .nav-btn.active {
+            background: #e63946;
+            color: #fff;
+        }
+        .case-card {
+            background: #1a1e29;
+            border: 1px solid #282d3c;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .btn-open {
+            background: #e63946;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+        }
+        #result {
+            margin-top: 15px;
+            font-size: 18px;
+            color: #ffca28;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2>SHOT</h2>
+        <div class="balance">💰 <span id="user-balance">100.00</span> $</div>
+    </div>
+
+    <div class="nav-menu">
+        <button class="nav-btn active">BONUSLAR</button>
+        <button class="nav-btn">KEYSLAR</button>
+        <button class="nav-btn">CASE BATTLES</button>
+        <button class="nav-btn">KONTRAKTLAR</button>
+        <button class="nav-btn">INVENTAR</button>
+    </div>
+
+    <div class="case-card">
+        <h3>🔥 Weapon Case</h3>
+        <p>Narxi: <b>$10.00</b></p>
+        <button class="btn-open" onclick="openCase()">KEYSNI OCHISH</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand(); // Oynani to'liq ekranga yozish
+
+        let balance = 100.0;
+
+        function openCase() {
+            if (balance < 10) {
+                alert("Balans yetarli emas!");
+                return;
+            }
+            balance -= 10;
+            document.getElementById("user-balance").innerText = balance.toFixed(2);
+            document.getElementById("result").innerText = "🎰 Keys ochilmoqda...";
+
+            setTimeout(() => {
+                const items = [
+                    {name: "AK-47 | Redline", price: 15},
+                    {name: "M4A4 | Evil Daimyo", price: 5},
+                    {name: "AWP | Atheris", price: 12},
+                    {name: "🔪 Knife | Fade", price: 250}
+                ];
+                const won = items[Math.floor(Math.random() * items.length)];
+                document.getElementById("result").innerText = `🎉 Yutuq: ${won.name} ($${won.price})`;
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
