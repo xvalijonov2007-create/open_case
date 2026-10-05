@@ -1,127 +1,229 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHOT CS2 Case Game</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body {
-            background-color: #12151d;
-            color: #ffffff;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 15px;
-            text-align: center;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #232733;
-            padding-bottom: 10px;
-        }
-        .balance {
-            background: #1e2330;
-            padding: 8px 15px;
-            border-radius: 8px;
-            color: #28a745;
-            font-weight: bold;
-        }
-        .nav-menu {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            margin: 15px 0;
-            padding-bottom: 5px;
-        }
-        .nav-btn {
-            background: #1e2330;
-            color: #8a8d9b;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-        .nav-btn.active {
-            background: #e63946;
-            color: #fff;
-        }
-        .case-card {
-            background: #1a1e29;
-            border: 1px solid #282d3c;
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-        .btn-open {
-            background: #e63946;
-            color: #fff;
-            border: none;
-            padding: 12px 25px;
-            font-size: 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 15px;
-        }
-        #result {
-            margin-top: 15px;
-            font-size: 18px;
-            color: #ffca28;
-            font-weight: bold;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CS Open Case</title>
+  <!-- Telegram Web App SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background-color: #12141c;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 15px;
+      font-size: 24px;
+      color: #e4ae39;
+    }
+    .nav-btns {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    button {
+      background-color: #e4ae39;
+      color: #000;
+      border: none;
+      padding: 10px 18px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    button:hover {
+      background-color: #ffc857;
+    }
+    
+    /* Case container & roulette */
+    .case-box {
+      width: 100%;
+      max-width: 360px;
+      background: #1b1e2b;
+      border: 2px solid #2d3248;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    .item-display {
+      height: 120px;
+      border: 2px dashed #444;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 15px 0;
+      font-size: 18px;
+      font-weight: bold;
+      background-color: #0f111a;
+    }
+
+    /* Modal (Inventar) */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+    .modal-content {
+      background: #1b1e2b;
+      width: 90%;
+      max-width: 400px;
+      max-height: 80vh;
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .inventory-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .inventory-card {
+      background: #25293c;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      border: 1px solid #3b415a;
+      font-size: 14px;
+    }
+    .close-btn {
+      background: #ff4757;
+      color: white;
+    }
+  </style>
 </head>
 <body>
 
-    <div class="header">
-        <h2>SHOT</h2>
-        <div class="balance">💰 <span id="user-balance">100.00</span> $</div>
+  <h1>CS Case Opener</h1>
+
+  <div class="nav-btns">
+    <button onclick="openInventory()">Inventar 🎒</button>
+  </div>
+
+  <div class="case-box">
+    <h3>Fever Case</h3>
+    <div id="item-display" class="item-display">Case tayyor!</div>
+    <button id="open-btn" onclick="openCase()">Keysni Ochish 🔑</button>
+  </div>
+
+  <!-- Inventar Modali -->
+  <div id="inventory-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Sizning Inventaringiz</h3>
+        <button class="close-btn" onclick="closeInventory()">✕</button>
+      </div>
+      <div id="inventory-grid" class="inventory-grid">
+        <!-- Tushgan skinlar shu yerga chiqadi -->
+      </div>
     </div>
+  </div>
 
-    <div class="nav-menu">
-        <button class="nav-btn active">BONUSLAR</button>
-        <button class="nav-btn">KEYSLAR</button>
-        <button class="nav-btn">CASE BATTLES</button>
-        <button class="nav-btn">KONTRAKTLAR</button>
-        <button class="nav-btn">INVENTAR</button>
-    </div>
+  <script>
+    // Telegram WebApp init
+    const tg = window.Telegram?.WebApp;
+    if (tg) tg.expand();
 
-    <div class="case-card">
-        <h3>🔥 Weapon Case</h3>
-        <p>Narxi: <b>$10.00</b></p>
-        <button class="btn-open" onclick="openCase()">KEYSNI OCHISH</button>
-        <div id="result"></div>
-    </div>
+    // Tushishi mumkin bo'lgan skinlar ro'yxati
+    const skins = [
+      { name: "AK-47 | Slate", color: "#4b69ff" },
+      { name: "M4A4 | Neo-Noir", color: "#d32ce6" },
+      { name: "AWP | Asiimov", color: "#eb4b4b" },
+      { name: "USP-S | Printstream", color: "#d32ce6" },
+      { name: "Glock-18 | Water Elemental", color: "#4b69ff" },
+      { name: "★ Karambit | Fade", color: "#caab05" }
+    ];
 
-    <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand(); // Oynani to'liq ekranga yozish
+    let isSpinning = false;
 
-        let balance = 100.0;
+    // Keysni ochish
+    function openCase() {
+      if (isSpinning) return;
+      isSpinning = true;
 
-        function openCase() {
-            if (balance < 10) {
-                alert("Balans yetarli emas!");
-                return;
-            }
-            balance -= 10;
-            document.getElementById("user-balance").innerText = balance.toFixed(2);
-            document.getElementById("result").innerText = "🎰 Keys ochilmoqda...";
+      const display = document.getElementById('item-display');
+      const openBtn = document.getElementById('open-btn');
+      openBtn.disabled = true;
 
-            setTimeout(() => {
-                const items = [
-                    {name: "AK-47 | Redline", price: 15},
-                    {name: "M4A4 | Evil Daimyo", price: 5},
-                    {name: "AWP | Atheris", price: 12},
-                    {name: "🔪 Knife | Fade", price: 250}
-                ];
-                const won = items[Math.floor(Math.random() * items.length)];
-                document.getElementById("result").innerText = `🎉 Yutuq: ${won.name} ($${won.price})`;
-            }, 1500);
+      let counter = 0;
+      const interval = setInterval(() => {
+        const randomSkin = skins[Math.floor(Math.random() * skins.length)];
+        display.innerText = randomSkin.name;
+        display.style.color = randomSkin.color;
+        counter++;
+
+        if (counter > 15) {
+          clearInterval(interval);
+          const winSkin = skins[Math.floor(Math.random() * skins.length)];
+          display.innerText = "🏆 " + winSkin.name;
+          display.style.color = winSkin.color;
+
+          // Inventarga saqlash
+          saveToInventory(winSkin);
+
+          isSpinning = false;
+          openBtn.disabled = false;
         }
-    </script>
+      }, 100);
+    }
+
+    // Inventarga saqlash funksiyasi
+    function saveToInventory(skin) {
+      let currentInv = JSON.parse(localStorage.getItem('user_inventory') || '[]');
+      currentInv.push(skin);
+      localStorage.setItem('user_inventory', JSON.stringify(currentInv));
+    }
+
+    // Inventar oynasini ochish
+    function openInventory() {
+      const modal = document.getElementById('inventory-modal');
+      const grid = document.getElementById('inventory-grid');
+      let currentInv = JSON.parse(localStorage.getItem('user_inventory') || '[]');
+
+      if (currentInv.length === 0) {
+        grid.innerHTML = "<p style='grid-column: span 2; text-align:center;'>Inventaringiz bo'sh!</p>";
+      } else {
+        grid.innerHTML = currentInv.map(item => `
+          <div class="inventory-card">
+            <span style="color: ${item.color}; font-weight: bold;">${item.name}</span>
+          </div>
+        `).join('');
+      }
+
+      modal.style.display = 'flex';
+    }
+
+    // Inventar oynasini yopish
+    function closeInventory() {
+      document.getElementById('inventory-modal').style.display = 'none';
+    }
+  </script>
 </body>
 </html>
